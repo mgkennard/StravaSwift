@@ -398,10 +398,13 @@ extension Router: URLRequestConvertible  {
     **/
     static var appAuthorizationUrl: URL {
         let baseUrl = "strava://oauth/mobile/authorize"
-        var urlComponents = URLComponents(string: baseUrl)!
-        urlComponents.queryItems = StravaClient.sharedInstance.authParams
-            .map { URLQueryItem(name: $0.key, value: "\($0.value)") }
-        return try! urlComponents.asURL()
+        let authParams = StravaClient.sharedInstance.authParams
+            .map { (key, value) in
+                let encodedValue = "\(value)".replacingOccurrences(of: ":", with: "%3A")
+                return "\(key)=\(encodedValue)"
+            }
+            .joined(separator:"&")
+        return URL(string: "\(baseUrl)?\(authParams)")!
     }
 
     /**
@@ -409,10 +412,13 @@ extension Router: URLRequestConvertible  {
      **/
     static var webAuthorizationUrl: URL {
         let baseUrl = "https://www.strava.com/oauth/authorize"
-        var urlComponents = URLComponents(string: baseUrl)!
-        urlComponents.queryItems = StravaClient.sharedInstance.authParams
-            .map { URLQueryItem(name: $0.key, value: "\($0.value)") }
-        return try! urlComponents.asURL()
+        let authParams = StravaClient.sharedInstance.authParams
+            .map { (key, value) in
+                let encodedValue = "\(value)".replacingOccurrences(of: ":", with: "%3A")
+                return "\(key)=\(encodedValue)"
+            }
+            .joined(separator:"&")
+        return URL(string: "\(baseUrl)?\(authParams)")!
     }
 
     /**
